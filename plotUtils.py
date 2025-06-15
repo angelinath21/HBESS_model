@@ -66,3 +66,63 @@ def plot_load_fft(load_vector, dt, title="FFT of Load Profile"):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+def plot_performance_degradation(time, soh_hess, soh_bess_only):
+    """
+    Plots State of Health (SoH) over time for HBESS and BESS only.
+    :param time: List or array of time points (seconds)
+    :param soh_hess: List or array of SoH values for HBESS (0 to 1)
+    :param soh_bess_only: List or array of SoH values for BESS only (0 to 1)
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(time, soh_hess, label="HBESS (Battery + Supercap)")
+    plt.plot(time, soh_bess_only, label="BESS Only (Battery)")
+    plt.xlabel("Time (seconds)")
+    plt.ylabel("State of Health (SoH)")
+    plt.title("Battery Performance Degradation Over Time")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_cycle_life(time, soh_hess, soh_bess_only, degradation_threshold=0.8):
+    """
+    Estimates cycle life based on when SoH crosses degradation threshold (e.g., 80% capacity).
+    Plots the degradation curves and marks cycle life points.
+    :param time: List or array of time points (seconds)
+    :param soh_hess: SoH values for HBESS (0 to 1)
+    :param soh_bess_only: SoH values for BESS only (0 to 1)
+    :param degradation_threshold: SoH threshold to define end of cycle life (default 0.8)
+    """
+    # Find first index where SoH <= threshold (or last index if never reached)
+    def find_cycle_life_index(soh):
+        for i, v in enumerate(soh):
+            if v <= degradation_threshold:
+                return i
+        return len(soh) - 1
+
+    idx_hess = find_cycle_life_index(soh_hess)
+    idx_bess = find_cycle_life_index(soh_bess_only)
+
+    cycle_life_time_hess = time[idx_hess]
+    cycle_life_time_bess = time[idx_bess]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(time, soh_hess, label="HBESS (Battery + Supercap)")
+    plt.plot(time, soh_bess_only, label="BESS Only (Battery)")
+
+    plt.axhline(y=degradation_threshold, color='r', linestyle='--', label=f'Degradation Threshold ({degradation_threshold*100}%)')
+
+    plt.scatter(cycle_life_time_hess, soh_hess[idx_hess], color='blue', marker='o',
+                label=f'HBESS Cycle Life @ {cycle_life_time_hess}s')
+    plt.scatter(cycle_life_time_bess, soh_bess_only[idx_bess], color='orange', marker='o',
+                label=f'BESS Cycle Life @ {cycle_life_time_bess}s')
+
+    plt.xlabel("Time (seconds)")
+    plt.ylabel("State of Health (SoH)")
+    plt.title("Cycle Life Estimation Based on SoH Degradation")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()

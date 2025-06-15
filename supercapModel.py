@@ -1,5 +1,5 @@
 class Supercapacitor:
-    def __init__(self, capacitance, voltage_init=480, r_internal=0.001, max_voltage=500, discharge_rate_kW=100):
+    def __init__(self, capacitance, voltage_init=480, r_internal=0.001, max_voltage=500, discharge_rate_kW=10):
         self.c = capacitance  # Farads
         self.voltage = voltage_init  # Volts
         self.max_voltage = max_voltage

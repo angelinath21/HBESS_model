@@ -3,7 +3,7 @@ from droopControl import droop_control
 from PIController import PIController
 
 class EMSController:
-    def __init__(self, battery, supercap, transient_threshold=1000, window_seconds=10):
+    def __init__(self, battery, supercap, transient_threshold=1000, window_seconds=1):
         self.battery = battery
         self.supercap = supercap
         self.transient_threshold = transient_threshold
@@ -25,6 +25,7 @@ class EMSController:
 
     def dispatch(self, instanenous_power_demand, dt, f_measured=49.8):
         is_transient = self.detect_transient(instanenous_power_demand)
+        print(f"{instanenous_power_demand}")
 
         sc_power = 0.0
         if is_transient:

@@ -57,3 +57,33 @@ class Battery:
 
         return terminal_voltage, current
 
+    def degrade_battery(battery, energy_discharged_kWh, degradation_rate=0.0001):
+        """
+        Simple degradation model:
+        - battery: Battery instance
+        - energy_discharged_kWh: energy removed this step in kWh
+        - degradation_rate: fraction capacity lost per kWh throughput (example value)
+
+        Updates battery capacity and SoH.
+        """
+        # Initialize cycle_energy_throughput attribute if not present
+        if not hasattr(battery, 'cycle_energy_throughput'):
+            battery.cycle_energy_throughput = 0.0
+
+        if not hasattr(battery, 'soh'):
+            battery.soh = 1.0  # State of Health (1.0 = 100%)
+
+        # Accumulate total energy throughput
+        battery.cycle_energy_throughput += energy_discharged_kWh
+
+        # Calculate degradation: linear model
+        capacity_loss = battery.cycle_energy_throughput * degradation_rate
+
+        # Update SoH and capacity
+        battery.soh = max(0.0, 1.0 - capacity_loss)
+        battery.capacity = battery.capacity * battery.soh
+
+        # Make sure remaining_capacity and soc do not exceed new capacity
+        battery.remaining_capacity = min(battery.remaining_capacity, battery.capacity)
+        battery.soc = max(0.0, min(1.0, battery.remaining_capacity / battery.capacity))
+
