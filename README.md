@@ -49,7 +49,6 @@ This repository contains the dynamic simulation and control strategy implementat
 - **Improved Voltage Stability**  
   - BESS overshoot: 21.8%  
   - HBESS overshoot: 10.1%  
-  - (see `Figure X`)
 
 - **Battery Health Impact**  
   SOC declined gradually with fewer aggressive cycles, improving battery longevity.
